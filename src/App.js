@@ -1,29 +1,39 @@
-import React from 'react'
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react'
+import { CardList } from "./components/card-list";
+import { SearchBox } from "./components/search-box";
 import './App.css';
-import Context from "./Context";
-import ClassContext from './ClassContext'
-import Test from './test'
-
-
 
 function App() {
+  const [cont, setCont] = useState([])
+  const [search, setSearch] = useState("")
+
+  
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(res => res.json())
+    .then(user => setCont(user))
+    .catch(err => console.error(err))
+
+    return () => {}
+  }, [])
+
+  const handleChange = e => {
+    e.preventDefault();
+    setSearch(e.target.value)
+  }
+
+  const filterVal = cont.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+
+
   return (
-    <ThemeContext.Provider value="dark1">
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <Context />
-          <p>and context is not change by hot reload</p>
-          <ClassContext />
-          <Test />
-        </header>
-      </div>
-    </ThemeContext.Provider>
+    <div className="App">
+      <h1>Monster Rolodex</h1>
+      <SearchBox handleChange={handleChange} placeholder="search monster" value={search} />
+      <CardList  lists={filterVal} />
+    </div>
   );
 }
-
-export const ThemeContext = React.createContext('light');
 
 
 export default App;
